@@ -3,6 +3,7 @@ package com.geekbang;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -16,6 +17,9 @@ public class SpringBucksApplicationTests {
 
     @Resource
     DataSource dataSource;
+
+    @Value("${test}")
+    String name;
 
     /**
      * 查看当前使用的数据源，以及该数据源参数
@@ -31,6 +35,7 @@ public class SpringBucksApplicationTests {
         System.out.println("druidDataSource 数据源初始化连接数：" + druidDataSource.getInitialSize());
 
         connection.close();
+        System.out.println(name);
     }
 
 }
