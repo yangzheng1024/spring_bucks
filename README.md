@@ -1,5 +1,3 @@
-# project
-
 # Getting Started
 
 ### Guides
