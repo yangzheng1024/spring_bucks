@@ -1,13 +1,18 @@
 package com.geekbang.dao;
 
+import com.geekbang.dao.base.BaseRepository;
 import com.geekbang.po.CoffeeOrder;
-import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 /**
  * coffeeOrder Dao
  *
  * @author 杨正
  */
-public interface CoffeeOrderDao extends JpaRepository<CoffeeOrder, Long> {
+public interface CoffeeOrderDao extends BaseRepository<CoffeeOrder, Long> {
 
+    List<CoffeeOrder> findByCustomerOrderById(String customer);
+
+    List<CoffeeOrder> findByItemsName(String name);
 }

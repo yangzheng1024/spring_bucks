@@ -1,5 +1,8 @@
 package com.geekbang.base;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,6 +15,9 @@ import java.util.Date;
  * @author 杨正
  */
 @MappedSuperclass
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BaseEntity {
 
     /**

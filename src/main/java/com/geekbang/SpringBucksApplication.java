@@ -15,10 +15,14 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 启动类
@@ -42,8 +46,37 @@ public class SpringBucksApplication implements ApplicationRunner {
 
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    @Transactional(rollbackFor = Exception.class)
+    public void run(ApplicationArguments args) {
         initOrder();
+        findOrders();
+    }
+
+    private void findOrders() {
+        coffeeDao.findAll(Sort.by(Sort.Direction.DESC, "id"))
+                .forEach(coffee -> log.info("loading... {}", coffee));
+
+        List<CoffeeOrder> list = coffeeOrderDao.findTop3ByOrderByUpdateTimeDesc();
+        list.forEach(coffeeOrder -> log.info("coffeeOrder {}", coffeeOrder));
+        log.info("findTop3ByOrderByUpdateTimeDesc {}", getJoinOrder(list));
+
+        list = coffeeOrderDao.findByCustomerOrderById("li si");
+        log.info("findByCustomerOrderById {}", getJoinOrder(list));
+
+        list.forEach(coffeeOrder -> {
+            log.info("order {}", coffeeOrder);
+            coffeeOrder.getItems()
+                    .forEach(coffee -> log.info("coffee {}", coffee));
+        });
+
+        list = coffeeOrderDao.findByItemsName("latte");
+        log.info("findByItemsName {}", getJoinOrder(list));
+    }
+
+    private String getJoinOrder(List<CoffeeOrder> list) {
+        return list.stream()
+                .map(coffeeOrder -> coffeeOrder.getId().toString())
+                .collect(Collectors.joining(","));
     }
 
     private void initOrder() {
@@ -67,7 +100,7 @@ public class SpringBucksApplication implements ApplicationRunner {
         coffeeOrderDao.save(zhangSan);
         log.info("order {}", zhangSan);
         CoffeeOrder liSi = CoffeeOrder.builder()
-                .customer("Li si")
+                .customer("li si")
                 .items(Arrays.asList(latee, civet))
                 .status(OrderEnum.INIT)
                 .build();
