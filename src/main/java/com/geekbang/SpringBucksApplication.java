@@ -1,13 +1,24 @@
 package com.geekbang;
 
+import com.geekbang.dao.CoffeeDao;
+import com.geekbang.dao.CoffeeOrderDao;
+import com.geekbang.enums.OrderEnum;
+import com.geekbang.po.Coffee;
+import com.geekbang.po.CoffeeOrder;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * 启动类
@@ -17,11 +28,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EnableJpaRepositories
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @PropertySource("classpath:config/config.properties")
 public class SpringBucksApplication implements ApplicationRunner {
 
-    @Value("${test}")
-    String name;
+    private final CoffeeDao coffeeDao;
+    private final CoffeeOrderDao coffeeOrderDao;
+
 
     public static void main(String[] args) {
         SpringApplication.run(SpringBucksApplication.class, args);
@@ -30,10 +43,36 @@ public class SpringBucksApplication implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        getName();
+        initOrder();
     }
 
-    private void getName() {
-        log.info(name);
+    private void initOrder() {
+        Coffee latee = Coffee.builder()
+                .name("latee")
+                .price(Money.of(CurrencyUnit.of("CNY"), 20))
+                .build();
+        coffeeDao.save(latee);
+        log.info("coffee {}", latee);
+        Coffee civet = Coffee.builder()
+                .name("civet")
+                .price(Money.of(CurrencyUnit.of("CNY"), 50))
+                .build();
+        coffeeDao.save(civet);
+        log.info("coffee {}", civet);
+        CoffeeOrder zhangSan = CoffeeOrder.builder()
+                .customer("zhang san")
+                .items(Collections.singletonList(latee))
+                .status(OrderEnum.BREWING)
+                .build();
+        coffeeOrderDao.save(zhangSan);
+        log.info("order {}", zhangSan);
+        CoffeeOrder liSi = CoffeeOrder.builder()
+                .customer("Li si")
+                .items(Arrays.asList(latee, civet))
+                .status(OrderEnum.INIT)
+                .build();
+        coffeeOrderDao.save(liSi);
+        log.info("order {}", liSi);
     }
+
 }
