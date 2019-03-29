@@ -39,11 +39,9 @@ public class SpringBucksApplication implements ApplicationRunner {
     private final CoffeeDao coffeeDao;
     private final CoffeeOrderDao coffeeOrderDao;
 
-
     public static void main(String[] args) {
         SpringApplication.run(SpringBucksApplication.class, args);
     }
-
 
     @Override
     @Transactional(rollbackFor = Exception.class)
