@@ -46,8 +46,8 @@ public class SpringBucksApplication implements ApplicationRunner {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void run(ApplicationArguments args) {
-        initOrder();
-        findOrders();
+//        initOrder();
+//        findOrders();
     }
 
     private void findOrders() {

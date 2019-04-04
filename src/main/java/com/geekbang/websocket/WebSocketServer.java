@@ -16,7 +16,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  *
  * @author 杨正
  */
-@ServerEndpoint(value = "/websocket")
+@ServerEndpoint(value = "/websocket/{userId}")
 @Component
 @EqualsAndHashCode
 @Slf4j
@@ -48,7 +48,8 @@ public class WebSocketServer {
      * @param session 可选的参数。session为与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
     @OnOpen
-    public void onOpen(Session session, EndpointConfig config) {
+    public void onOpen(Session session, @PathParam(value = "userId") String userId) {
+        log.info("userId：{}", userId);
         this.session = session;
         this.sid = session.getId();
         // 加入set中
