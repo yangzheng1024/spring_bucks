@@ -5,6 +5,7 @@ import com.geekbang.dao.CoffeeOrderDao;
 import com.geekbang.enums.OrderEnum;
 import com.geekbang.po.Coffee;
 import com.geekbang.po.CoffeeOrder;
+import com.geekbang.websocket.WebSocketServer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.money.CurrencyUnit;
@@ -14,6 +15,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -40,7 +42,8 @@ public class SpringBucksApplication implements ApplicationRunner {
     private final CoffeeOrderDao coffeeOrderDao;
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringBucksApplication.class, args);
+        ConfigurableApplicationContext applicationContext = SpringApplication.run(SpringBucksApplication.class, args);
+        WebSocketServer.setApplicationContext(applicationContext);
     }
 
     @Override

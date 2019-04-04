@@ -1,7 +1,10 @@
 package com.geekbang.websocket;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -21,6 +24,14 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @EqualsAndHashCode
 @Slf4j
 public class WebSocketServer {
+
+    public static final String SESSION_ID_PREFIX = "SESSION_ID_PREFIX";
+    private StringRedisTemplate stringRedisTemplate;
+    private static ApplicationContext applicationContext;
+
+    public static void setApplicationContext(ApplicationContext context) {
+        applicationContext = context;
+    }
 
     /**
      * 静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
@@ -49,9 +60,10 @@ public class WebSocketServer {
      */
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "userId") String userId) {
-        log.info("userId：{}", userId);
         this.session = session;
         this.sid = session.getId();
+        stringRedisTemplate = applicationContext.getBean(StringRedisTemplate.class);
+        stringRedisTemplate.opsForValue().set(StrUtil.format(SESSION_ID_PREFIX, userId), sid);
         // 加入set中
         webSocketSet.add(this);
         // 在线数加1
