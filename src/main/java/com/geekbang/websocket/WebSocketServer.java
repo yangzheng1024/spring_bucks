@@ -1,6 +1,5 @@
 package com.geekbang.websocket;
 
-import cn.hutool.core.util.StrUtil;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -25,7 +24,16 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Slf4j
 public class WebSocketServer {
 
-    public static final String SESSION_ID_PREFIX = "SESSION_ID_PREFIX";
+    /**
+     * 存放sessionId的redis前缀
+     */
+    public static final String WEB_SOCKET_SESSION_ID_PREFIX = "web_socket_session_id_prefix";
+
+    /**
+     * 存放push info的redis前缀
+     */
+    public static final String WEB_SOCKET_PUSH_INFO_PREFIX = "web_socket_push_info_prefix";
+
     private StringRedisTemplate stringRedisTemplate;
     private static ApplicationContext applicationContext;
 
@@ -63,7 +71,7 @@ public class WebSocketServer {
         this.session = session;
         this.sid = session.getId();
         stringRedisTemplate = applicationContext.getBean(StringRedisTemplate.class);
-        stringRedisTemplate.opsForValue().set(StrUtil.format(SESSION_ID_PREFIX, userId), sid);
+        stringRedisTemplate.opsForValue().set(WEB_SOCKET_SESSION_ID_PREFIX + userId, sid);
         // 加入set中
         webSocketSet.add(this);
         // 在线数加1
@@ -87,10 +95,9 @@ public class WebSocketServer {
      * 收到客户端消息后调用的方法
      *
      * @param message 客户端发送过来的消息
-     * @param session 可选的参数
      */
     @OnMessage
-    public void onMessage(String message, Session session) {
+    public void onMessage(String message) {
         log.info("收到来自窗口{}的信息:{}", sid, message);
         // 群发消息
         for (WebSocketServer item : webSocketSet) {
@@ -104,12 +111,9 @@ public class WebSocketServer {
 
     /**
      * 发生错误时调用
-     *
-     * @param session
-     * @param error
      */
     @OnError
-    public void onError(Session session, Throwable error) {
+    public void onError(Throwable error) {
         log.info("发生错误！");
         error.printStackTrace();
     }
@@ -119,7 +123,7 @@ public class WebSocketServer {
      *
      * @param message 推送信息
      */
-    public void sendMessage(String message) throws IOException {
+    private void sendMessage(String message) throws IOException {
         this.session.getBasicRemote().sendText(message);
         //this.session.getAsyncRemote().sendText(message);
     }
@@ -127,7 +131,7 @@ public class WebSocketServer {
     /**
      * 群发自定义消息
      */
-    public static void sendInfo(String message, @PathParam("sid") String sid) throws IOException {
+    public static void sendInfo(String message, @PathParam("sid") String sid) {
         log.info("推送消息到窗口{}，推送内容:{}", sid, message);
         for (WebSocketServer item : webSocketSet) {
             try {
@@ -143,15 +147,15 @@ public class WebSocketServer {
         }
     }
 
-    public static synchronized int getOnlineCount() {
+    private static synchronized int getOnlineCount() {
         return onlineCount;
     }
 
-    public static synchronized void addOnlineCount() {
+    private static synchronized void addOnlineCount() {
         WebSocketServer.onlineCount++;
     }
 
-    public static synchronized void subOnlineCount() {
+    private static synchronized void subOnlineCount() {
         WebSocketServer.onlineCount--;
     }
 }
