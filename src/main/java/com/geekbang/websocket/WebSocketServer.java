@@ -27,12 +27,12 @@ public class WebSocketServer {
     /**
      * 存放sessionId的redis前缀
      */
-    public static final String WEB_SOCKET_SESSION_ID_PREFIX = "web_socket_session_id_prefix";
+    public static final String WEB_SOCKET_SESSION_ID_PREFIX = "web_socket_session_id_prefix_";
 
     /**
      * 存放push info的redis前缀
      */
-    public static final String WEB_SOCKET_PUSH_INFO_PREFIX = "web_socket_push_info_prefix";
+    public static final String WEB_SOCKET_PUSH_INFO_PREFIX = "web_socket_push_info_prefix_";
 
     private StringRedisTemplate stringRedisTemplate;
     private static ApplicationContext applicationContext;
