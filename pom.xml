@@ -84,6 +84,13 @@
             <version>2.1.0.RELEASE</version>
         </dependency>
 
+        <!-- disruptor 队列框架 -->
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+
         <!-- lombok相关依赖 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
